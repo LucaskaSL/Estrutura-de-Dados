@@ -14,16 +14,20 @@ void despedida() {
 }
 
 int main(int argc, char *argv[]) {
+if (argc < 3) {
+    printf("Uso correto: %s <num1> <num2>\n", argv[0]);
+    return 1;
+}
 int num1, num2, resultado;
 printf("\nMultiplicando valores passados na linha de comando\n");
 num1 = atoi(argv[1]); //atoi converte alfanumericos em numeros decimais
 num2 = atoi(argv[2]);
 resultado = num1 * num2;
-  printf("\n%d X %d = %d\n",num1 ,num2, resultado);
+  printf("%d X %d = %d\n",num1 ,num2, resultado);
   //getch();
 
 
-    if (argc < 2) {
+   if (argc < 4) {
         printf("Uso: %s [saudacao|despedida]\n", argv[0]);
         return 1;
     }
