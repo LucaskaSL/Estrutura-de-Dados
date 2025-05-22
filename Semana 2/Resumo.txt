@@ -1,0 +1,38 @@
+Eficiência é otimização do tempo, redução de recursos e uso de baixa potência
+Quais são os tipos de complexidade computacional?
+-> Tempo: número de passos executados
+-> Espaço: tamanho da alocação em memória
+
+void exemplo(uint32_t n) {
+c1(); executa 1 vez
+for(uint32_t i = 0; i < n; i++) chama n vezes
+c2(); executa n vez
+for(uint32_t j = 0; j < n; j++) chama n vezes
+c3(); executa n vez
+ for(uint32_t k = 0; k < n; k++) chama n vezes
+c4(); executa n vez
+} //por isso o tempo fica de c1 + c2*n + c3*n^2 + c4*n^3
+nesse pseudo código, os cx() representam sub-rotinas, isto é, operações elementares ou constantes, 
+usadas para análise de complexidade, placeholders que:
+-> Executam em tempo fixo (independente do tamanho do input)
+-> Podem ser qualquer coisa simples: somar dois números, acessar um vetor, fazer uma comparação, trocar valores, etc
+
+g(n) representa uma função de crescimento que descreve o comportamento do tempo de execução (ou uso de memória)
+naquele caso de exemplo(), g(n) = c*n^3, sempre pegando o maior expoente
+A análise assintótica é a verificação do tempo de execução baseado no número de passos
+O(g(n))	Limite superior: o algoritmo não passa de g(n) exemplo(n) < g(n)
+Ω(g(n))	Limite inferior: o algoritmo faz no mínimo g(n) exemplo(n) > g(n)
+Θ(g(n))	Limite preciso: o algoritmo faz exatamente g(n)  exemplo(n) = g(n)
+
+Para algoritmos iterativos, ou seja, sem recursão, a análise assintótica ocorre:
+identificar operações primitivas;
+identificar a quantidade de vezes que cada uma dessas primitivas é executada;
+Somar essas execuções.
+Você lembra quais são as operações primitivas? 
+    - Avaliação de expressões booleanas;
+    - Operações matemáticas;
+    - Retorno de métodos;
+    - Atribuição;
+    - Acesso à variáveis e posições arbitrárias de um array
+
+
