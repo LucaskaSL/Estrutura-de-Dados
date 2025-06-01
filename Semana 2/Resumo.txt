@@ -35,4 +35,17 @@ Você lembra quais são as operações primitivas?
     - Atribuição;
     - Acesso à variáveis e posições arbitrárias de um array
 
+No algoritmo iterativo, quando ele não depende da entrada, sempre será Θ(…),
+Caso dependa da entrada, como num algoritmo de ordenação(como a lista estava inicialmente) varia entre O, Θ, Ω
 
+
+Método Mestre:
+Verifique o grau (expoente) de 𝑓(𝑛)
+f(n) e compare com log(de a)(na base b)
+🔸 Se o grau de 𝑓(𝑛) for menor, é Caso 1 (recursão domina).
+T(n) = Θ(n^log(de a)(na base b))
+🔸 Se for igual, é Caso 2 (empate).
+T(n) = Θ(n^log(de a)(na base b) * log n), se tiver algum log na T(n), simplesmente eleve o log n de Θ à quantidade de
+logs em T(n) + 1
+🔸 Se for maior, é Caso 3 (trabalho externo domina, verifica regularidade).
+ T(n) = Θ(f(n))
