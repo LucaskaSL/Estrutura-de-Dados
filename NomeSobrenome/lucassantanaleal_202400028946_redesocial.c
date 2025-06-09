@@ -7,7 +7,7 @@
 //./nomesobrenome input.txt output.txt
 
 typedef struct No{
-char nome[50];
+char nome[51];
 struct No* proximo;
 struct No* anterior;
 } No;
@@ -41,7 +41,7 @@ No* atual = lista->inicio;
 
 while(atual != NULL) {
         if (strcmp(atual->nome, pessoa) == 0) {
-            char nome_temp[50];
+            char nome_temp[51];
             strcpy(nome_temp, pessoa);
             modificar_nome(nome_temp);
             fprintf(output, "[FAILURE]ADD=%s\n", nome_temp);
@@ -56,7 +56,7 @@ if(novo == NULL){
         exit(1);
 }
 
-if(strlen(pessoa) > 0 && strlen(pessoa) <= 49){
+if(strlen(pessoa) > 0 && strlen(pessoa) <= 51){
 strcpy(novo->nome, pessoa);
 novo->proximo = NULL;
 novo->anterior = lista->fim;
@@ -65,7 +65,7 @@ if (lista->fim != NULL) lista->fim->proximo = novo; //Conecta o antigo último n
 else lista->inicio = novo; //só ocorre se a lista estivesse vazia
 
 lista->fim = novo; //aqui atualiza o fim da lista independente se ela estava vazia ou não
-char nome_temp[50];
+char nome_temp[51];
 strcpy(nome_temp, pessoa);
 modificar_nome(nome_temp);
 fprintf(output, "[SUCCESS]ADD=%s\n", nome_temp);
@@ -77,13 +77,13 @@ void remover_pessoa(Lista* lista, char* pessoa, FILE* output){
 No* atual = lista->inicio;
 while(atual != NULL){
     if(strcmp(atual->nome, pessoa) == 0){
-        if(atual->anterior != NULL) atual->anterior->proximo = atual->proximo;
+        if(atual->anterior != NULL) atual->anterior->proximo = atual->proximo; //o ponteiro do nó anterior que antes apontava para o atual, passa a apontar para o nó que vem depois do atual
         else lista->inicio = atual->proximo;
         
-        if(atual->proximo != NULL) atual->proximo->anterior = atual->anterior;
+        if(atual->proximo != NULL) atual->proximo->anterior = atual->anterior; //o contrario do comentario de cima
         else lista->fim = atual->anterior;
     free(atual);
-    char nome_temp[50];
+    char nome_temp[51];
     strcpy(nome_temp, pessoa);
     modificar_nome(nome_temp);
     fprintf(output, "[SUCCESS]REMOVE=%s\n", nome_temp);
@@ -91,7 +91,7 @@ while(atual != NULL){
 }
 atual = atual->proximo;
 }
-char nome_temp[50];
+char nome_temp[51];
 strcpy(nome_temp, pessoa);
 modificar_nome(nome_temp);
 fprintf(output, "[FAILURE]REMOVE=%s\n", nome_temp);
@@ -101,7 +101,7 @@ void imprimir_pessoa_amigos(Lista* lista, char* pessoa, FILE* output){
 No* atual = lista->inicio;
     while(atual != NULL){
         if(strcmp(atual->nome, pessoa) == 0){
-            char atual_temp[50], anterior_temp[50], proximo_temp[50];
+            char atual_temp[51], anterior_temp[51], proximo_temp[51];
             strcpy(atual_temp, pessoa);
             modificar_nome(atual_temp);
 
@@ -118,7 +118,7 @@ No* atual = lista->inicio;
         }
     atual = atual->proximo;
     }
-char nome_temp[50];
+char nome_temp[51];
 strcpy(nome_temp, pessoa);
 modificar_nome(nome_temp);
 fprintf(output, "[FAILURE]SHOW=?<-%s->?\n", nome_temp);
@@ -137,11 +137,11 @@ if(input == NULL){
 
 FILE* output = fopen(argv[2], "w");
 if(output == NULL){
-    printf("Erro ao abrir o arquivo de input");
+    printf("Erro ao abrir o arquivo de output");
     return 1;
 }
 
-char comando[10], nome[50];
+char comando[10], nome[51];
 while(fscanf(input, "%s %[^\n]", comando, nome) != EOF){ //com o %[^\n] eu consigo ler a linha toda até \n
 //o fgets antes ele não consumia os espaços entre os comandos, as setas com o começo dos nomes
 //ou seja ele lia o nome como " Jose da Silva", ai a função pra substituir os " " colocava o _ em tudo
