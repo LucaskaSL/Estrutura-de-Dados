@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
-//gcc lucassantanaleal_202400028946_engenhodebusca.c -o  lucassantanaleal_202400028946_engenhodebusca
-//./lucassantanaleal_202400028946_engenhodebusca input.txt output.txt
+//gcc antigo.c -o antigo
+//./antigo input.txt output.txt
 
 
 uint8_t checksum(const char *requisicoes){ //o const garante que a string não será alterada, apenas lida
@@ -22,31 +22,39 @@ char *strdup_custom(const char *src) {
     return dest;
 }
 
-uint32_t hashing(uint32_t qtd_servidores, const char *requisicao, uint32_t tentantiva){
-    return ((7919 * checksum(requisicao)) + tentantiva*(((104729 * checksum(requisicao)) + 123))) %qtd_servidores;
+uint32_t hashmap1(uint32_t qtd_servidores, const char *requisicao){
+    return (7919 * checksum(requisicao)) % qtd_servidores;
 }
 
-uint32_t inserir_servidor_teste(char ***servidor, uint32_t tamanho_servidor, uint32_t qtd_servidores, char *requisicao, FILE* output){
-    uint32_t tentativa = 0;
-    while(1){
-        uint32_t pos = hashing(qtd_servidores, requisicao, tentativa);
+uint32_t hashmap2(uint32_t qtd_servidores, const char *requisicao){
+    return 1 + (((104729 * checksum(requisicao)) + 123) % (qtd_servidores - 1)); //tive que alterar porque tava sempre h2 = 0, aqui força valores diferentes
+}
 
-            for(int j = 0; j < tamanho_servidor; j++){
-                if(servidor[pos][j] == NULL){
-                    servidor[pos][j] = strdup_custom(requisicao);
+uint32_t double_hashing(uint32_t qtd_servidores, const char *requisicao, uint32_t tentativa){
+    return (hashmap1(qtd_servidores, requisicao) + tentativa*hashmap2(qtd_servidores, requisicao)) % qtd_servidores;      
+}
 
-                    if(tentativa > 0){
-                        fprintf(output, "S%u->S%u\n", hashing(qtd_servidores, requisicao, 0), pos);
-                    }
-                return pos;
+//iterar infinitamente
+
+uint32_t inserir_servidor(char ***servidor, uint32_t tamanho_servidor, uint32_t qtd_servidores, char *requisicao, FILE* output) {
+    for(uint32_t tentativa = 0; tentativa < qtd_servidores; tentativa++){
+        uint32_t pos = double_hashing(qtd_servidores, requisicao, tentativa); //aplica somente o hashmap1, já que tentativa == 0
+
+        for(uint32_t j = 0; j < tamanho_servidor; j++){
+            if(servidor[pos][j] == NULL){ //coloca a requisição na sua posição correta depois do hash1
+                servidor[pos][j] = strdup_custom(requisicao); //aqui coloca a requisicao na "cabeça" do servidor e segue até ele encher
+                if(tentativa > 0){ //pra isso acontecer tem que haver colisão
+                    fprintf(output, "S%d->S%d\n", hashmap1(qtd_servidores, requisicao), pos); //aqui faz a transferencia de servidor, já q ele encheu
                 }
+                    return pos;
             }
-    tentativa++;
+        }
     }
+    return -1; //se tudo estiver cheio
 }
 
 void amostrar_servidor(char ***servidor, uint32_t tamanho_servidor, uint32_t pos, FILE* output) {
-    fprintf(output, "S%u:", pos);
+    fprintf(output, "S%d:", pos);
 
     int primeira = 1; //só pra ter um rastreio do "tamanho" do servidor
 
@@ -85,14 +93,14 @@ int main(int argc, char* argv[]){
     char ***servidor;
     uint32_t qtd_requisicoes, qtd_servidores, tamanho_servidor;
     FILE* input = fopen(argv[1], "r");
-    if(input == NULL){
-        perror("Erro ao abrir o arquivo de input");
-        return 1;
+        if(input == NULL){
+    printf("Erro ao abrir o arquivo de input");
+    return 1;
     }
     FILE* output = fopen(argv[2], "w");
-    if(output == NULL){
-        perror("Erro ao abrir o arquivo de output");
-        return 1;
+        if(output == NULL){
+    printf("Erro ao abrir o arquivo de output");
+    return 1;
     }
 
     fscanf(input, "%u %u", &qtd_servidores, &tamanho_servidor);
@@ -120,7 +128,7 @@ int main(int argc, char* argv[]){
     char nome_para_armazenar[1001] = "";
     concatenar_com_underscore(nome_para_armazenar, nomes, qtd_strings);
 
-    uint32_t pos_inserido = inserir_servidor_teste(servidor, tamanho_servidor, qtd_servidores, nome_para_armazenar, output);
+    uint32_t pos_inserido = inserir_servidor(servidor, tamanho_servidor, qtd_servidores, nome_para_armazenar, output);
         if (pos_inserido != -1) amostrar_servidor(servidor, tamanho_servidor, pos_inserido, output);
 
     for (uint32_t i = 0; i < qtd_strings; i++) {
