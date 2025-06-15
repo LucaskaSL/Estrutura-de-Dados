@@ -9,7 +9,7 @@
 typedef struct elemento{
 struct elemento* proximo;
 uint32_t paginas;
-char nome[50];
+char nome[51];
 } elemento;
 
 typedef struct fila{
@@ -27,6 +27,51 @@ char nome[100];
 uint32_t tempo_ocupado_ate;
 } impressora;
 
+typedef struct evento { //evento é o documento após ser impresso
+    char nome_doc[51];
+    uint32_t paginas;
+    uint32_t tempo_final;
+} evento;
+
+int comparar_eventos(const void* a, const void* b) {
+    evento* ea = (evento*)a;
+    evento* eb = (evento*)b;
+    return (ea->tempo_final - eb->tempo_final);
+}
+
+
+
+void trocar(evento* a, evento* b) {
+    evento temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int particionar(evento* arr, int baixo, int alto) {
+    uint32_t pivo = arr[alto].tempo_final;
+    int i = baixo - 1;
+
+    for (int j = baixo; j < alto; j++) {
+        if (arr[j].tempo_final < pivo) {
+            i++;
+            trocar(&arr[i], &arr[j]);
+        }
+    }
+
+    trocar(&arr[i + 1], &arr[alto]);
+    return i + 1;
+}
+
+void quicksort(evento* arr, int baixo, int alto) {
+    if (baixo < alto) {
+        int pi = particionar(arr, baixo, alto);
+        quicksort(arr, baixo, pi - 1);
+        quicksort(arr, pi + 1, alto);
+    }
+}
+
+
+
 void inserir_final_fila(fila* fila, uint32_t paginas, char* nome_documento){
 elemento* novo = (elemento*) malloc(sizeof(elemento));
 if(novo == NULL){
@@ -36,7 +81,7 @@ if(novo == NULL){
 
 novo->proximo = NULL;
 novo->paginas = paginas;
-if (strlen(nome_documento) == 0 || strlen(nome_documento) > 49) {
+if (strlen(nome_documento) == 0 || strlen(nome_documento) > 51) {
     printf("Nome de documento invalido!\n");
     free(novo);
     return;
@@ -88,7 +133,7 @@ if(novo == NULL){
 
 novo->paginas = paginas;
 novo->proximo = pilha->topo;
-if (strlen(nome_documento) == 0 || strlen(nome_documento) > 49) {
+if (strlen(nome_documento) == 0 || strlen(nome_documento) > 51) {
     printf("Nome de documento invalido!\n");
     free(novo);
     return;
@@ -160,26 +205,27 @@ while (atual != NULL) {
 fprintf(output, "\n");
 }
 
-int verificar_impressora_vazia(impressora* impressora){
-return (impressora->pilha_pessoal->topo == NULL);
-}
-
-void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fila_documentos, pilha* pilha_final, FILE* output) {
+void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fila_documentos, pilha* pilha_final, FILE* output, int quantidade_documentos) {
     uint32_t total_paginas = 0;
+    int qtd_eventos = 0;
+    evento* eventos = malloc(sizeof(evento) * quantidade_documentos);
 
     while (fila_documentos->inicio != NULL) {
-
         int idx = encontrar_impressora_mais_disponivel(impressoras, qtd_impressoras);
-
         elemento* doc = fila_documentos->inicio;
 
         uint32_t inicio_impressao = impressoras[idx].tempo_ocupado_ate;
+        uint32_t fim_impressao = inicio_impressao + doc->paginas;
 
-        impressoras[idx].tempo_ocupado_ate = inicio_impressao + doc->paginas;
+        impressoras[idx].tempo_ocupado_ate = fim_impressao;
 
         inserir_topo_pilha(impressoras[idx].pilha_pessoal, doc->paginas, doc->nome);
 
-        inserir_topo_pilha(pilha_final, doc->paginas, doc->nome);
+        // Salvar evento
+        strcpy(eventos[qtd_eventos].nome_doc, doc->nome);
+        eventos[qtd_eventos].paginas = doc->paginas;
+        eventos[qtd_eventos].tempo_final = fim_impressao;
+        qtd_eventos++;
 
         total_paginas += doc->paginas;
 
@@ -188,27 +234,18 @@ void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fi
         retirar_documento_fila(fila_documentos);
     }
 
-    fprintf(output, "%up\n", total_paginas);
-}
+    // Ordena eventos pela ordem de término
+    quicksort(eventos, 0, qtd_eventos - 1);
 
-void inserir_pilha_final(impressora* impressoras, int qtd_impressoras, pilha* pilha_final){
-
-    while(1){
-
-        for (int i = 0; i < qtd_impressoras; i++) {
-            if (impressoras[i].pilha_pessoal->topo == NULL) {
-                inserir_topo_pilha(pilha_final, impressoras[i].pilha_pessoal->topo->paginas, impressoras[i].pilha_pessoal->topo->nome);
-                retirar_documento_pilha(impressoras[i].pilha_pessoal);
-                break;
-            }
-        
-        }
-        
-        break;
+    // Monta pilha final na ordem correta
+    for (int i = 0; i < qtd_eventos; i++) {
+        inserir_topo_pilha(pilha_final, eventos[i].paginas, eventos[i].nome_doc);
     }
+
+    fprintf(output, "%up\n", total_paginas);
+
+    free(eventos);
 }
-
-
 
 int main(int argc, char* argv[]){
 fila documentos_a_serem_impressos;
@@ -232,8 +269,6 @@ if(output == NULL){
 int quantidade_impressoras, quantidade_documentos;
 fscanf(input, "%d", &quantidade_impressoras);
 
-//printf("%d %d\n", quantidade_impressoras, quantidade_documentos);
-
 impressora* impressoras = malloc(sizeof(impressora) * quantidade_impressoras);
 for (int i = 0; i < quantidade_impressoras; i++) {
     impressoras[i].pilha_pessoal = malloc(sizeof(pilha));
@@ -245,14 +280,13 @@ for (int i = 0; i < quantidade_impressoras; i++) {
 fscanf(input, "%d", &quantidade_documentos);
 
 for (int i = 0; i < quantidade_documentos; i++) {
-    char nome_doc[50];
+    char nome_doc[51];
     int paginas;
     fscanf(input, "%s %d", nome_doc, &paginas);
     inserir_final_fila(&documentos_a_serem_impressos, paginas, nome_doc);
 }
 
-processar_documentos(impressoras, quantidade_impressoras, &documentos_a_serem_impressos, &pilha_final, output);
-inserir_pilha_final(impressoras, quantidade_impressoras, &pilha_final);
+processar_documentos(impressoras, quantidade_impressoras, &documentos_a_serem_impressos, &pilha_final, output, quantidade_documentos);
 amostrar_elementos_pilha_documentos(&pilha_final, output);
 
 

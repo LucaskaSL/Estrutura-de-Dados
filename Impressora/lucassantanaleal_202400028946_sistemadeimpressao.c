@@ -7,24 +7,24 @@
 //./lucassantanaleal_202400028946_sistemadeimpressao input.txt output.txt
 
 typedef struct elemento{
-struct elemento* proximo;
-uint32_t paginas;
-char nome[51];
+    struct elemento* proximo;
+    uint32_t paginas;
+    char nome[51];
 } elemento;
 
-typedef struct fila{
-elemento* inicio;
-elemento* fim;
+    typedef struct fila{
+    elemento* inicio;
+    elemento* fim;
 } fila;
 
 typedef struct pilha{
-elemento* topo;
+    elemento* topo;
 } pilha;
 
 typedef struct impressora{
-pilha* pilha_pessoal;
-char nome[100];
-uint32_t tempo_ocupado_ate;
+    pilha* pilha_pessoal;
+    char nome[100];
+    uint32_t tempo_ocupado_ate;
 } impressora;
 
 typedef struct evento { //evento é o documento após ser impresso
@@ -38,8 +38,6 @@ int comparar_eventos(const void* a, const void* b) {
     evento* eb = (evento*)b;
     return (ea->tempo_final - eb->tempo_final);
 }
-
-
 
 void trocar(evento* a, evento* b) {
     evento temp = *a;
@@ -69,8 +67,6 @@ void quicksort(evento* arr, int baixo, int alto) {
         quicksort(arr, pi + 1, alto);
     }
 }
-
-
 
 void inserir_final_fila(fila* fila, uint32_t paginas, char* nome_documento){
 elemento* novo = (elemento*) malloc(sizeof(elemento));
@@ -210,18 +206,25 @@ void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fi
     int qtd_eventos = 0;
     evento* eventos = malloc(sizeof(evento) * quantidade_documentos);
 
+    uint32_t tempo_global = 0;
+
     while (fila_documentos->inicio != NULL) {
         int idx = encontrar_impressora_mais_disponivel(impressoras, qtd_impressoras);
         elemento* doc = fila_documentos->inicio;
 
-        uint32_t inicio_impressao = impressoras[idx].tempo_ocupado_ate;
+    // Tempo de início é o maior entre o tempo atual e o tempo que a impressora ficará livre
+        if (tempo_global < impressoras[idx].tempo_ocupado_ate) {
+            tempo_global = impressoras[idx].tempo_ocupado_ate;
+        }
+
+        uint32_t inicio_impressao = tempo_global;
         uint32_t fim_impressao = inicio_impressao + doc->paginas;
 
         impressoras[idx].tempo_ocupado_ate = fim_impressao;
+        tempo_global = inicio_impressao; // mantém tempo atual para a próxima rodada
 
         inserir_topo_pilha(impressoras[idx].pilha_pessoal, doc->paginas, doc->nome);
 
-        // Salvar evento
         strcpy(eventos[qtd_eventos].nome_doc, doc->nome);
         eventos[qtd_eventos].paginas = doc->paginas;
         eventos[qtd_eventos].tempo_final = fim_impressao;
@@ -230,9 +233,8 @@ void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fi
         total_paginas += doc->paginas;
 
         amostrar_pilha_impressora(&impressoras[idx], output);
-
         retirar_documento_fila(fila_documentos);
-    }
+}
 
     // Ordena eventos pela ordem de término
     quicksort(eventos, 0, qtd_eventos - 1);
