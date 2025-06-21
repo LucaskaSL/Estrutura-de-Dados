@@ -26,14 +26,14 @@ uint32_t hashing(uint32_t qtd_servidores, const char *requisicao, uint32_t tenta
     return ((7919 * checksum(requisicao)) + tentantiva*(((104729 * checksum(requisicao)) + 123))) %qtd_servidores;
 }
 
-uint32_t inserir_servidor_teste(char ***servidor, uint32_t tamanho_servidor, uint32_t qtd_servidores, char *requisicao, FILE* output){
+uint32_t inserir_servidor_teste(char ***servidor, uint32_t tamanho_servidor, uint32_t qtd_servidores, char *requisicao, char *requisicao_armazenada, FILE* output){
     uint32_t tentativa = 0;
     while(1){
         uint32_t pos = hashing(qtd_servidores, requisicao, tentativa);
 
             for(int j = 0; j < tamanho_servidor; j++){
                 if(servidor[pos][j] == NULL){
-                    servidor[pos][j] = strdup_custom(requisicao);
+                    servidor[pos][j] = strdup_custom(requisicao_armazenada);
 
                     if(tentativa > 0){
                         fprintf(output, "S%u->S%u\n", hashing(qtd_servidores, requisicao, 0), pos);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
     char nome_para_armazenar[1001] = "";
     concatenar_com_underscore(nome_para_armazenar, nomes, qtd_strings);
 
-    uint32_t pos_inserido = inserir_servidor_teste(servidor, tamanho_servidor, qtd_servidores, nome_para_armazenar, output);
+    uint32_t pos_inserido = inserir_servidor_teste(servidor, tamanho_servidor, qtd_servidores, nome_para_hash, nome_para_armazenar, output);
         if (pos_inserido != -1) amostrar_servidor(servidor, tamanho_servidor, pos_inserido, output);
 
     for (uint32_t i = 0; i < qtd_strings; i++) {

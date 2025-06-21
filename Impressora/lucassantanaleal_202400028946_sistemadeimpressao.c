@@ -27,11 +27,13 @@ typedef struct impressora{
     uint32_t tempo_ocupado_ate;
 } impressora;
 
-typedef struct evento { //evento é o documento após ser impresso
+typedef struct evento { //doc após processamento
     char nome_doc[51];
     uint32_t paginas;
     uint32_t tempo_final;
+    int ordem_chegada; 
 } evento;
+
 
 int comparar_eventos(const void* a, const void* b) {
     evento* ea = (evento*)a;
@@ -46,11 +48,12 @@ void trocar(evento* a, evento* b) {
 }
 
 int particionar(evento* arr, int baixo, int alto) {
-    uint32_t pivo = arr[alto].tempo_final;
+    evento pivo = arr[alto];
     int i = baixo - 1;
 
     for (int j = baixo; j < alto; j++) {
-        if (arr[j].tempo_final < pivo) {
+        if (arr[j].tempo_final < pivo.tempo_final ||
+           (arr[j].tempo_final == pivo.tempo_final && arr[j].ordem_chegada < pivo.ordem_chegada)) {
             i++;
             trocar(&arr[i], &arr[j]);
         }
@@ -171,10 +174,10 @@ while(atual != NULL){
 }
 }
 
-//-------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------------//
 
-int encontrar_impressora_mais_disponivel(impressora* impressoras, int qtd_impressoras) {
-    int indice_menor = 0;
+int encontrar_impressora_mais_disponivel(impressora* impressoras, int qtd_impressoras) { 
+    int indice_menor = 0; 
     for (int i = 0; i < qtd_impressoras; i++) {
         if (impressoras[i].tempo_ocupado_ate < impressoras[indice_menor].tempo_ocupado_ate) {
             indice_menor = i;
@@ -207,12 +210,12 @@ void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fi
     evento* eventos = malloc(sizeof(evento) * quantidade_documentos);
 
     uint32_t tempo_global = 0;
+    int ordem = 0; // novo contador
 
     while (fila_documentos->inicio != NULL) {
         int idx = encontrar_impressora_mais_disponivel(impressoras, qtd_impressoras);
         elemento* doc = fila_documentos->inicio;
 
-    // Tempo de início é o maior entre o tempo atual e o tempo que a impressora ficará livre
         if (tempo_global < impressoras[idx].tempo_ocupado_ate) {
             tempo_global = impressoras[idx].tempo_ocupado_ate;
         }
@@ -221,25 +224,24 @@ void processar_documentos(impressora* impressoras, int qtd_impressoras, fila* fi
         uint32_t fim_impressao = inicio_impressao + doc->paginas;
 
         impressoras[idx].tempo_ocupado_ate = fim_impressao;
-        tempo_global = inicio_impressao; // mantém tempo atual para a próxima rodada
+        tempo_global = inicio_impressao;
 
         inserir_topo_pilha(impressoras[idx].pilha_pessoal, doc->paginas, doc->nome);
 
         strcpy(eventos[qtd_eventos].nome_doc, doc->nome);
         eventos[qtd_eventos].paginas = doc->paginas;
         eventos[qtd_eventos].tempo_final = fim_impressao;
-        qtd_eventos++;
+        eventos[qtd_eventos].ordem_chegada = ordem++; // adiciona ordem
 
+        qtd_eventos++;
         total_paginas += doc->paginas;
 
         amostrar_pilha_impressora(&impressoras[idx], output);
         retirar_documento_fila(fila_documentos);
-}
+    }
 
-    // Ordena eventos pela ordem de término
     quicksort(eventos, 0, qtd_eventos - 1);
 
-    // Monta pilha final na ordem correta
     for (int i = 0; i < qtd_eventos; i++) {
         inserir_topo_pilha(pilha_final, eventos[i].paginas, eventos[i].nome_doc);
     }
