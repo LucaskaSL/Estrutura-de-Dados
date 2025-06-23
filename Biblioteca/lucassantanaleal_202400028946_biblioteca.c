@@ -146,8 +146,8 @@ void amostrar_tudo(livros* vetor, uint32_t quantidade_livros, uint64_t* buscas, 
 
     // O cálculo da média DEVE usar double para evitar truncamento de inteiros.
     // A formatação %.0f imprime o resultado como um inteiro arredondado.
-    fprintf(output, "Binary=%u:%u\n", vitorias_bb, passos_realizados_bb_total / quantidade_buscas);
-    fprintf(output, "Interpolation=%u:%u", vitorias_bi, passos_realizados_bi_total / quantidade_buscas);
+    fprintf(output, "BINARY=%u:%u\n", vitorias_bb, passos_realizados_bb_total / quantidade_buscas);
+    fprintf(output, "INTERPOLATION=%u:%u", vitorias_bi, passos_realizados_bi_total / quantidade_buscas);
 }
 
 int main(int argc, char* argv[]){
