@@ -1,0 +1,27 @@
+1 - Explique porque é utilizada a análise assintótica e qual a
+importância de utilização da notação O
+Usamos a análise assintótica para comparar o tempo de execução ou uso de memória das funções num algoritmo,
+verificando assim sua eficiência e complexidade, sendo ignorado no processo constantes e 
+expoentes de menor magnitude. Ou seja, essa análise não busca processar o tempo exato de execução
+do algoritmo, mas sim seu comportamento conforme o número de dados na entrada cresce, independendo
+assim do tipo do hardware ou da linguagem utilizada.
+
+Nesse contexto, a notação big O serve para quantificar essa eficiência, sendo utilizado para
+descrever o melhor caso de execução da função. Além do mais, existem as notações Omega e Theta,
+que respectivamente, representam o pior e o médio caso.
+
+
+2 - Descreva com suas palavras o que você entende por pior
+caso, melhor caso e caso médio
+A análise dos casos se refere a como a função vai se comportar a depender de como foi feita
+a entrada dos dados. Concomitantemente, representam a natureza dos limites que a função
+tem em relação com a função g(n). Ou seja, o melhor caso, denotado por big O, é por exemplo,
+quando um algoritmo de ordenação ordena uma lista já ordenada. O pior caso, denotado por Θ (Theta),
+é quando naquele exemplo da ordenação, a função leva o maior tempo de execução para ordenar a lista,
+O caso médio, denotado por Ω (Ômega), é o meio termo dos casos anteriores.
+
+
+3 - Verifique como calcular a complexidade de algoritmos
+implementados recursivamente
+
+

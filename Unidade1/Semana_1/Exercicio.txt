@@ -1,0 +1,61 @@
+1 - Realize experimentos para descobrir a organização dos bytes do computador (endianness)
+&x é um valor ponteiro, que nesse caso é do tipo int *, isto é, o endereço de memória de x, é tratado como um ponteiro, 
+mas não é uma variável ponteiro, quando definisse px = &x, você está atribuindo o endereço de x para uma variável ponteiro
+
+2 - Verifique o funcionamento da aritmética de ponteiros em diferentes tipos de dados
+Toda vez que declaro uma nova variável, o endereço de memória das anteriores é mudado, pois:
+O compilador:
+- Reorganiza a alocação de variáveis locais durante a compilação;
+- Pode aplicar otimizações (reordenar, agrupar, realocar variáveis no stack frame);
+- Não garante endereços fixos entre execuções nem entre versões do código.
+
+O sistema operacional:
+- Aloca uma pilha (stack) para cada programa quando ele roda;
+- Cada vez que você roda seu programa, o stack pode começar em um endereço diferente;
+- Isso é normal por causa de uma técnica chamada ASLR (Address Space Layout Randomization), usada para segurança
+
+Tem vezes que o endereço muda entre execuções, sem que eu declare novas variáveis
+
+3- Compare como diferentes linguagens de programação fazem o gerenciamento de memória
+Em assembly, o gerenciamento é totalmente feito pelo progamador, decidindo onde e o que colocar na memória,
+isso exige controle total sobre a pilha, a área de dados e a eventual 
+solicitação de memória ao sistema operacional (como via mmap ou brk).
+
+Em C e C++, o gerenciamento é de certa forma manual, pois já existem as funções malloc, calloc, realloc, free, as quais estão associadas ao heap durante a alocação dinâmica. Também a pilha é preenchida
+conforme aloca cada vez mais variáveis locais. Os dados estáticos e globais são alocados na .dada e .bss.
+Não há garbage collector, sendo gerenciado pelo programador para evitar memory leak.
+
+Já nas linguagens de mais alto nível, como Java, Python e JS, todo esse processo de gerenciamento é automático,
+a coleta de lixo pode ter um impacto na performance do programa, pois a linguagem precisa interromper a execução
+do código para realizar a limpeza da memória. 
+
+4 - Revise a passagem de parâmetros por linha de comando e as operações de entrada e de saída formatada em arquivos
+gcc treino2.c -o treino2 cria um arquivo .exe, que designa um executavel, o que no windows é necessário, sempre que
+que eu alterar algo no código, eu devo digitar esse comando para atualizar o builder, ou seja, recompilá-lo.
+./nomedoarquivo é o comando para que o arquivo seja executado
+
+. → significa o diretório atual.
+
+/ → é o separador de caminho (como em uma pasta).
+
+nomedoarquivo → é o nome do arquivo executável que você quer rodar.
+
+O ./nomedoarquivo já é o argv[0], dessa forma ./nomedoarquivo argv1 argv2 argv3 ...
+A biblioteca <conio.h> é essencial para um trabalho mais minuncioso com linhas de comando,
+ele possui algumas funções a mais. Ele não existe no linux nem o macOS
+
+
+5 - Busque ferramentas para depuração e detecção de vazamentos de memória (memory leak)
+Valgrind:
+Uma ferramenta de profiling de código aberto, popularmente utilizada para depuração e profiling de aplicações C e C++,
+especialmente para detectar vazamentos de memória. Indica a linha onde ocorreu o vazamento e a origem da alocação.
+
+AddressSanitizer (ASan):
+Um detector de erros de memória integrado a compiladores como GCC e Clang, que pode detectar diversos problemas relacionados
+à memória, incluindo vazamentos, com baixo impacto no tempo de execução. Gera mensagens precisas com linha e arquivo.
+
+CRT (C Runtime Library):
+A biblioteca CRT do Visual Studio oferece funções de heap de depuração que podem ajudar a detectar vazamentos de memória
+e outros erros relacionados à memória. 
+stdio.h → Roteiro de peças de teatro (só declara quem vai entrar em cena).
+CRT → Os próprios atores, figurinos, iluminação (fazem a ação acontecer de verdade).

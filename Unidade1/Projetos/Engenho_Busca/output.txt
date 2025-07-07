@@ -1,0 +1,6 @@
+S0:ufs
+S0:ufs,a_b_c
+S2:cd_ef
+S2:cd_ef,e_d
+S0->S1
+S1:hash
