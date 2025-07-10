@@ -4,7 +4,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-//gcc lucassantanaleal_202400028946_arvorebinaria.c -o lucassantanaleal_202400028946_arvorebinaria
+//gcc -Wall lucassantanaleal_202400028946_arvorebinaria.c -o lucassantanaleal_202400028946_arvorebinaria
 //./lucassantanaleal_202400028946_arvorebinaria input.txt output.txt
 
 typedef struct Arquivo{
@@ -69,14 +69,24 @@ void libera_arvore(Arvore* a) {
 void in_ordem(Arvore *arvore, FILE* output) {
    if (arvore != NULL) {
       in_ordem (arvore->Esquerda, output);
-      fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+      if(arvore->arquivo_no->tamanho == 1){
+        fprintf (output, "%u:%s|%s|%" PRIu64 "_byte\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+      }
+      else{
+        fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+      }
       in_ordem (arvore->Direita, output);
    }
 }
 
 void pre_ordem(Arvore *arvore, FILE* output) {
     if (arvore != NULL) {
-        fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+        if(arvore->arquivo_no->tamanho == 1){
+            fprintf (output, "%u:%s|%s|%" PRIu64 "_byte\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+      }
+        else{
+            fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+      }
         pre_ordem (arvore->Esquerda, output);
         pre_ordem (arvore->Direita, output);
     }
@@ -86,7 +96,12 @@ void pos_ordem(Arvore *arvore, FILE* output) {
    if (arvore != NULL) {
         pos_ordem (arvore->Esquerda, output);
         pos_ordem (arvore->Direita, output);
-        fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+        if(arvore->arquivo_no->tamanho == 1){
+            fprintf (output, "%u:%s|%s|%" PRIu64 "_byte\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+        }
+        else{
+            fprintf (output, "%u:%s|%s|%" PRIu64 "_bytes\n", arvore->arquivo_no->indice, arvore->arquivo_no->nome, arvore->arquivo_no->tipo, arvore->arquivo_no->tamanho);
+        }
    }
 }
 
@@ -110,8 +125,9 @@ int main(int argc, char* argv[]){
 
 
     for(int i = 0; i < quantidade_documentos; i++){
-        //fscanf(input, "%50s %2s %" SCNu64 "", &vetor[i].nome, &vetor[i].tipo, &vetor[i].tamanho);
-        fscanf(input, "%50[^ ] %2[^ ] %" SCNu64 "", &vetor[i].nome, &vetor[i].tipo, &vetor[i].tamanho);
+        fscanf(input, "%50s %2s %" SCNu64 "", vetor[i].nome, vetor[i].tipo, &vetor[i].tamanho);
+        //fscanf(input, "%50[^ ] %2[^ ] %" SCNu64 "", &vetor[i].nome, &vetor[i].tipo, &vetor[i].tamanho);
+        //fscanf(input, "%50[^ ] %2[^ ] %[^\n]", &vetor[i].nome, &vetor[i].tipo, &vetor[i].tamanho);
     }
     
     Arvore *arvore_busca = cria_arv_vazia();
