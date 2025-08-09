@@ -97,7 +97,9 @@ void quicksort_eventos(evento* arr, int baixo, int alto) {
 
 void inserir_final_fila(fila* fila, uint32_t paginas, char* nome_documento, uint32_t original_index){
     elemento* novo = (elemento*) malloc(sizeof(elemento));
-    if(novo == NULL){ exit(1); }
+    if(novo == NULL){ 
+        exit(1); 
+    }
     novo->proximo = NULL;
     novo->paginas = paginas;
     strcpy(novo->nome, nome_documento);

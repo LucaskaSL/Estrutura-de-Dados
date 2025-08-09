@@ -1,0 +1,146 @@
+Resumidamente na EPD eu sigo meio que achando os pequenos bloquinhos da árvore, da esquerda pra direita e de baixo pra 
+cima formados pelo nó filho da esquerda, o no pai e o no da direita, chegando ate a raiz e fazendo essa mesma coisa do outro lado
+
+Na PED eu vou meio que seguindo direto pelos pais da esquerda e quando acabar eu vou colocando o resto da direita que falta
+
+Na EDP dou preferência a completar a esquerda->direita de cada no ate o ultimo da ordem ser a raiz
+
+Árvore 0:
+        A
+       / \
+      B   C
+     / \ / \
+    D  E F  G
+
+EPD
+DBEACFG
+
+PED
+ABDECFG
+
+EDP
+DEBFGCA
+
+Árvore 1:
+        M
+       / \
+      F   T
+     / \    \
+    B   H    Z
+EPD
+BFHMTZ
+
+PED
+MFBHTZ
+
+EDP
+BHFZTM
+
+Árvore 2:
+        P
+       /
+      L
+     /
+    G
+   / \
+  D   I
+EPD
+DGILP
+
+PED
+PLGDI
+
+EDP
+DIGLP
+
+Árvore 3:
+        R
+       / \
+      O   Y
+     /   /
+    C   U
+         \
+          W
+EPD
+CORWUY
+
+PED
+ROCYUW
+
+EDP
+COWUYR
+
+Árvore 4:
+        A
+       / \
+      B   C
+           \
+            D
+           / \
+          E   F
+EPD
+BAEDFC // BACEDF
+
+PED
+ABCDEF
+
+EDP
+BEFDCA
+
+Árvore 5
+        X
+         \
+          Y
+           \
+            Z
+           /
+          W
+         /
+        V
+EPD
+VWZYX
+
+PED
+XYZWV
+
+EDP
+VWZYX
+
+Árvore 6
+                M
+              /   \
+            G       T
+           / \     / \
+         D    J   P   Y
+        /      \     /
+       B        K   V
+        \        \
+         C        W
+EPD
+CBDGWKJMPTVY
+
+PED
+MGDBCJKWTPYV
+
+EDP
+CBDWKJGPVYTM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
