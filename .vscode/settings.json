@@ -4,6 +4,10 @@
         "stdio.h": "c",
         "inttypes.h": "c",
         "stdint.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "initializer_list": "c",
+        "type_traits": "c",
+        "xstring": "c",
+        "xutility": "c"
     }
 }
