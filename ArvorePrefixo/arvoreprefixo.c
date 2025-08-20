@@ -163,30 +163,28 @@ int main(int argc, char* argv[]) {
     }
 
     for (uint32_t i = 0; i < quantidade_requisicoes; i++) {
-        uint32_t comprimento_prefixo_comum;
-        char* requisicao_atual = vetor_requisicoes[i];
+    uint32_t comprimento_prefixo_comum = 0;
+    char* requisicao_atual = vetor_requisicoes[i];
+    fprintf(output, "%s:", requisicao_atual);
 
-        no* no_do_prefixo = encontrar_no_prefixo(nos, requisicao_atual, &comprimento_prefixo_comum);
+    no* no_do_prefixo = encontrar_no_prefixo(nos, requisicao_atual, &comprimento_prefixo_comum);
 
-        if (no_do_prefixo != NULL && comprimento_prefixo_comum > 0) {
-            uint32_t max_len = 2 * comprimento_prefixo_comum;
+    int eh_primeira_palavra = 1;
 
-            char buffer_palavra[21];
-            strncpy(buffer_palavra, requisicao_atual, comprimento_prefixo_comum);
-            buffer_palavra[comprimento_prefixo_comum] = '\0';
-
-            fprintf(output, "%s:", requisicao_atual); 
-            int eh_primeira_palavra = 1; 
-            coletar_palavras(no_do_prefixo, buffer_palavra, max_len, output, &eh_primeira_palavra);
-        }
-
-        else{
-            fprintf(output, "%s:-", requisicao_atual);
-        }
+    if (no_do_prefixo != NULL && comprimento_prefixo_comum > 0) {
+        uint32_t max_len = 2 * comprimento_prefixo_comum;
+        char buffer_palavra[21];
+        strncpy(buffer_palavra, requisicao_atual, comprimento_prefixo_comum);
+        buffer_palavra[comprimento_prefixo_comum] = '\0';
         
-        if (i < quantidade_requisicoes - 1) {
-            fprintf(output, "\n");
-        }
+        coletar_palavras(no_do_prefixo, buffer_palavra, max_len, output, &eh_primeira_palavra);
+    }
+    
+    if (eh_primeira_palavra == 1) {
+        fprintf(output, "-");
+    }
+    
+    fprintf(output, "\n");
     }
 
     for (uint32_t i = 0; i < quantidade_requisicoes; i++) {

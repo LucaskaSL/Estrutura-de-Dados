@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-//gcc lucassantanaleal_202400028946_loteria.c -o lucassantanaleal_202400028946_loteria
-//./lucassantanaleal_202400028946_loteria input.txt output.txt
+//gcc teste.c -o teste
+//./teste input.txt output.txt
 
 typedef struct apostadores{
     char chave[33];
@@ -13,7 +13,7 @@ typedef struct apostadores{
     uint32_t quantidade_acertos;
 } apostadores;
 
-typedef struct heap{
+typedef struct Heap{
     apostadores* apostadores;
     uint32_t tamanho;
     uint32_t capacidade;
@@ -62,7 +62,7 @@ Heap* criar_heap(uint32_t capacidade){
     return heap;
 }
 
-void inserir_heap(Heap* heap, apostadores apostador_inserido){
+void inserir_heapmax(Heap* heap, apostadores apostador_inserido){
     if (heap->tamanho == heap->capacidade) {
         return;
     }
@@ -72,6 +72,21 @@ void inserir_heap(Heap* heap, apostadores apostador_inserido){
     heap->apostadores[i] = apostador_inserido;
 
     while (i != 0 && heap->apostadores[(i - 1) / 2].quantidade_acertos < heap->apostadores[i].quantidade_acertos) {
+        trocar_apostadores(&heap->apostadores[i], &heap->apostadores[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+
+void inserir_heapmin(Heap* heap, apostadores apostador_inserido){
+    if (heap->tamanho == heap->capacidade) {
+        return;
+    }
+
+    heap->tamanho++;
+    int i = heap->tamanho - 1;
+    heap->apostadores[i] = apostador_inserido;
+
+    while (i != 0 && heap->apostadores[(i - 1) / 2].quantidade_acertos > heap->apostadores[i].quantidade_acertos) {
         trocar_apostadores(&heap->apostadores[i], &heap->apostadores[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
@@ -145,20 +160,7 @@ int main(int argc, char* argv[]){
         &apostador[i].aposta[3], &apostador[i].aposta[4], &apostador[i].aposta[5], &apostador[i].aposta[6], &apostador[i].aposta[7], &apostador[i].aposta[8], 
         &apostador[i].aposta[9], &apostador[i].aposta[10], &apostador[i].aposta[11], &apostador[i].aposta[12], &apostador[i].aposta[13], &apostador[i].aposta[14]);
     }
-
-    
-    for(int i = 0; i < quantidade_apostas; i++){
-        for(int j = 0; j < 15; j++){
-            for(int k = 0; k < 10; k++){
-                if(premio[k] == apostador[i].aposta[j]){
-                    apostador[i].quantidade_acertos++;
-                }
-            }
-        }
-    }
-    
-
-    /*
+        
     bool numeros_sorteados[51] = {false};
     for (int k = 0; k < 10; k++) {
         if (premio[k] <= 50) {
@@ -174,22 +176,20 @@ int main(int argc, char* argv[]){
             }
         }
     }
-    */
 
-    Heap* heap = criar_heap(quantidade_apostas);
+    Heap* heapmax = criar_heap(quantidade_apostas);
     for(int i = 0; i < quantidade_apostas; i++){
-        inserir_heap(heap, apostador[i]);
+        inserir_heapmax(heapmax, apostador[i]);
     }
-
 
     apostadores* apostador_ganhador_max = (apostadores*) malloc(sizeof(apostadores) * quantidade_apostas);
     uint32_t quantidade_ganho_maximo = 0;
-    apostadores referencia_maxima = extrair_Max(heap);
+    apostadores referencia_maxima = extrair_Max(heapmax);
     apostador_ganhador_max[0] = referencia_maxima;
     quantidade_ganho_maximo++;
 
-    while(heap->tamanho > 0 && heap->apostadores[0].quantidade_acertos == referencia_maxima.quantidade_acertos) {
-            apostador_ganhador_max[quantidade_ganho_maximo++] = extrair_Max(heap);
+    while(heapmax->tamanho > 0 && heapmax->apostadores[0].quantidade_acertos == referencia_maxima.quantidade_acertos) {
+            apostador_ganhador_max[quantidade_ganho_maximo++] = extrair_Max(heapmax);
         }
 
     fprintf(output, "[%u:%u:%u]\n", quantidade_ganho_maximo, referencia_maxima.quantidade_acertos, metade_maior/quantidade_ganho_maximo);
@@ -197,16 +197,20 @@ int main(int argc, char* argv[]){
         fprintf(output, "%s\n", apostador_ganhador_max[i].chave);
     }
 
-    heapify_min(heap, 0);
+    
+    Heap* heapmin = criar_heap(quantidade_apostas);
+    for(int i = 0; i < quantidade_apostas; i++){
+        inserir_heapmin(heapmin, apostador[i]);
+    }
 
     apostadores* apostador_ganhador_min = (apostadores*) malloc(sizeof(apostadores) * quantidade_apostas);
     uint32_t quantidade_ganho_minimo = 0;
-    apostadores referencia_minima = extrair_Min(heap);
+    apostadores referencia_minima = extrair_Min(heapmin);
     apostador_ganhador_min[0] = referencia_minima;
     quantidade_ganho_minimo++;
 
-    while(heap->tamanho > 0 && heap->apostadores[0].quantidade_acertos == referencia_minima.quantidade_acertos) {
-            apostador_ganhador_min[quantidade_ganho_minimo++] = extrair_Max(heap);
+    while(heapmin->tamanho > 0 && heapmin->apostadores[0].quantidade_acertos == referencia_minima.quantidade_acertos) {
+            apostador_ganhador_min[quantidade_ganho_minimo++] = extrair_Min(heapmin);
         }
 
     fprintf(output, "[%u:%u:%u]\n", quantidade_ganho_minimo, referencia_minima.quantidade_acertos, metade_menor/quantidade_ganho_minimo);
@@ -214,12 +218,14 @@ int main(int argc, char* argv[]){
         fprintf(output, "%s\n", apostador_ganhador_min[i].chave);
     }
 
-    free(apostador_ganhador_min);
+   /*  free(apostador_ganhador_min);
     free(apostador_ganhador_max);
     free(apostador);
-    free(heap->apostadores);
-    free(heap);
+    free(heapmax->apostadores);
+    free(heapmin->apostadores);
+    free(heapmax);
+    free(heapmin);
     fclose(input);
-    fclose(output);
+    fclose(output); */
     return 0;
 }
