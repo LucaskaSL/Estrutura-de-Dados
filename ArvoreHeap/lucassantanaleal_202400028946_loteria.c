@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-//gcc teste.c -o teste
-//./teste input.txt output.txt
+//gcc lucassantanaleal_202400028946_loteria.c -o lucassantanaleal_202400028946_loteria
+//./lucassantanaleal_202400028946_loteria input.txt output.txt
 
 typedef struct apostadores{
     char chave[33];
