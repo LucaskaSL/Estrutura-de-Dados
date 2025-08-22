@@ -64,13 +64,18 @@ uint32_t calcular_prefixo_comum(const char* str1, const char* str2){
     return comprimento;
 }
 
-void verificar_e_coletar_palavras(no* no_atual, char* buffer_palavra, const char* palavra_requisicao, FILE* output, int* eh_primeira_palavra){
+void verificar_e_coletar_palavras(no* no_atual, char* buffer_palavra, uint32_t profundidade, const char* palavra_requisicao, FILE* output, int* eh_primeira_palavra){
     if(no_atual == NULL){
         return;
     }
 
+    uint32_t L = calcular_prefixo_comum(buffer_palavra, palavra_requisicao);
+
+    if(profundidade > (2 * L) && L < strlen(palavra_requisicao)){
+        return;
+    }
+
     if(no_atual->valor != NULL){
-        uint32_t L = calcular_prefixo_comum(buffer_palavra, palavra_requisicao);
 
         if(L > 0 && strlen(buffer_palavra) <= (2 * L)){  
             if(*eh_primeira_palavra == 1){
@@ -89,7 +94,7 @@ void verificar_e_coletar_palavras(no* no_atual, char* buffer_palavra, const char
             buffer_palavra[comprimento_atual] = 'a' + i;
             buffer_palavra[comprimento_atual + 1] = '\0';
             
-            verificar_e_coletar_palavras(no_atual->ponteiros[i], buffer_palavra, palavra_requisicao, output, eh_primeira_palavra);
+            verificar_e_coletar_palavras(no_atual->ponteiros[i], buffer_palavra, profundidade + 1, palavra_requisicao, output, eh_primeira_palavra);
             
             buffer_palavra[comprimento_atual] = '\0';
         }
@@ -127,7 +132,7 @@ int main(int argc, char* argv[]){
     char** vetor_termos = (char**) malloc(sizeof(char*) * quantidade_termos);
     for(int i = 0; i < quantidade_termos; i++){
         vetor_termos[i] = (char*) malloc(sizeof(char) * 21);
-        fscanf(input, "%s", vetor_termos[i]);
+        fscanf(input, "%20s", vetor_termos[i]);
     }
 
     uint32_t quantidade_requisicoes;
@@ -136,7 +141,7 @@ int main(int argc, char* argv[]){
     char** vetor_requisicoes = (char**) malloc(sizeof(char*) * quantidade_requisicoes);
     for(int i = 0; i < quantidade_requisicoes; i++){
         vetor_requisicoes[i] = (char*) malloc(sizeof(char) * 21);
-        fscanf(input, "%s", vetor_requisicoes[i]);
+        fscanf(input, "%20s", vetor_requisicoes[i]);
     }
 
     no* nos = NULL;
@@ -148,10 +153,11 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < quantidade_requisicoes; i++){
     fprintf(output, "%s:", vetor_requisicoes[i]);
 
-    char buffer_palavra[21] = ""; 
+    char buffer_palavra[25] = ""; 
     int eh_primeira_palavra = 1;
+    uint32_t profundidade = 0;
 
-    verificar_e_coletar_palavras(nos, buffer_palavra, vetor_requisicoes[i], output, &eh_primeira_palavra);
+    verificar_e_coletar_palavras(nos, buffer_palavra, profundidade, vetor_requisicoes[i], output, &eh_primeira_palavra);
     if(eh_primeira_palavra == 1){
         fprintf(output, "-");
     }
@@ -165,10 +171,11 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < quantidade_termos; i++){
         free(vetor_termos[i]);
     }
-    free(vetor_requisicoes);
+
+    /* free(vetor_requisicoes);
     free(vetor_termos);
     liberar_arvore(nos);
     fclose(input);
-    fclose(output);
+    fclose(output); */
     return 0;
 }
