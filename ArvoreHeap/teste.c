@@ -159,6 +159,8 @@ int main(int argc, char* argv[]){
         fscanf(input, "%s %u %u %u %u %u %u %u %u %u %u %u %u %u %u %u", apostador[i].chave, &apostador[i].aposta[0], &apostador[i].aposta[1], &apostador[i].aposta[2], 
         &apostador[i].aposta[3], &apostador[i].aposta[4], &apostador[i].aposta[5], &apostador[i].aposta[6], &apostador[i].aposta[7], &apostador[i].aposta[8], 
         &apostador[i].aposta[9], &apostador[i].aposta[10], &apostador[i].aposta[11], &apostador[i].aposta[12], &apostador[i].aposta[13], &apostador[i].aposta[14]);
+
+        apostador[i].quantidade_acertos = 0; 
     }
         
     bool numeros_sorteados[51] = {false};

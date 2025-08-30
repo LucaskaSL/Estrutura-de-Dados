@@ -75,7 +75,7 @@ void verificar_e_coletar_palavras(no* no_atual, char* buffer_palavra, uint32_t p
         return;
     }
 
-    if(no_atual->valor != NULL){
+    if(no_atual->valor != NULL){ //onde ele deixa de ser nulo? preciso depurar, alguma outra lógica associada ao ponteiro
 
         if(L > 0 && strlen(buffer_palavra) <= (2 * L)){  
             if(*eh_primeira_palavra == 1){
