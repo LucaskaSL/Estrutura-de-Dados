@@ -62,7 +62,7 @@ uint32_t geradora(uint32_t z){
     return (z + (-1 + (myrand() % 3)));
 }
 
-/*void propagar_cadeia(no*** matriz, no* paciente_zero, no* infectante_atual, uint32_t altura, uint32_t largura, FILE* output, uint32_t infectados_count, uint32_t total_pessoas) {
+void propagar_cadeia(no*** matriz, no* paciente_zero, no* infectante_atual, uint32_t altura, uint32_t largura, FILE* output, uint32_t infectados_count, uint32_t total_pessoas) {
     if (infectados_count >= total_pessoas) {
         return;
     }
@@ -72,14 +72,14 @@ uint32_t geradora(uint32_t z){
     while (true) {
         while (true) {
             novo_x = geradora(infectante_atual->coordenada_x);
-            if (novo_x >= 0 && novo_x < (int32_t)largura) {
+            if (novo_x >= 0 && novo_x < largura) {
                 break;
             }
         }
         
         while (true) {
             novo_y = geradora(infectante_atual->coordenada_y);
-            if (novo_y >= 0 && novo_y < (int32_t)altura) {
+            if (novo_y >= 0 && novo_y < altura) {
                 break; 
             }
         }
@@ -95,9 +95,9 @@ uint32_t geradora(uint32_t z){
     printf("Infectando: (%d,%d)\n", novo_x, novo_y);
     
     propagar_cadeia(matriz, paciente_zero, proximo_alvo, altura, largura, output, infectados_count + 1, total_pessoas);
-}*/
+}
 
-void propagar_cadeia(no*** matriz, no* paciente_zero, no* infectante_atual, uint32_t altura, uint32_t largura, FILE* output, uint32_t infectados_count, uint32_t total_pessoas) {
+void propagar_cadeia2(no*** matriz, no* paciente_zero, no* infectante_atual, uint32_t altura, uint32_t largura, FILE* output, uint32_t infectados_count, uint32_t total_pessoas) {
     if (infectados_count >= total_pessoas) {
         return;
     }
@@ -131,7 +131,7 @@ void propagar_cadeia(no*** matriz, no* paciente_zero, no* infectante_atual, uint
     fprintf(output, ";(%d,%d)", novo_x, novo_y);
     printf("Infectando: (%d,%d)\n", novo_x, novo_y);
     
-    propagar_cadeia(matriz, paciente_zero, proximo_alvo, altura, largura, output, infectados_count + 1, total_pessoas);
+    propagar_cadeia2(matriz, paciente_zero, proximo_alvo, altura, largura, output, infectados_count + 1, total_pessoas);
 }
 
 int main(int argc, char* argv[]) {
