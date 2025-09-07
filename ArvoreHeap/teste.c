@@ -19,8 +19,7 @@ typedef struct Heap{
     uint32_t capacidade;
 } Heap;
 
-void trocar_apostadores(apostadores* a, apostadores* b)
-{
+void trocar_apostadores(apostadores* a, apostadores* b){
     apostadores temp = *a;
     *a = *b;
     *b = temp;
@@ -29,10 +28,13 @@ void trocar_apostadores(apostadores* a, apostadores* b)
 void heapify_max(Heap* heap, uint32_t i) {
     uint32_t Pai = i, Esquerda = 2*i + 1, Direita = 2*i + 2;
 
-    if(Esquerda < heap->tamanho && heap->apostadores[Esquerda].quantidade_acertos > heap->apostadores[Pai].quantidade_acertos)
+    if (Esquerda < heap->tamanho && heap->apostadores[Esquerda].quantidade_acertos > heap->apostadores[Pai].quantidade_acertos) {
         Pai = Esquerda;
-    if(Direita < heap->tamanho && heap->apostadores[Direita].quantidade_acertos > heap->apostadores[Pai].quantidade_acertos)
+    }
+
+    if (Direita < heap->tamanho && heap->apostadores[Direita].quantidade_acertos > heap->apostadores[Pai].quantidade_acertos) {
         Pai = Direita;
+    }
 
     if(Pai != i) {
     trocar_apostadores(&heap->apostadores[i], &heap->apostadores[Pai]);
@@ -43,10 +45,13 @@ void heapify_max(Heap* heap, uint32_t i) {
 void heapify_min(Heap* heap, uint32_t i) {
     uint32_t Pai = i, Esquerda = 2*i + 1, Direita = 2*i + 2;
 
-    if(Esquerda < heap->tamanho && heap->apostadores[Esquerda].quantidade_acertos < heap->apostadores[Pai].quantidade_acertos)
+    if (Esquerda < heap->tamanho && heap->apostadores[Esquerda].quantidade_acertos < heap->apostadores[Pai].quantidade_acertos) {
         Pai = Esquerda;
-    if(Direita < heap->tamanho && heap->apostadores[Direita].quantidade_acertos < heap->apostadores[Pai].quantidade_acertos)
-        Pai = Direita;
+    }
+
+    if (Direita < heap->tamanho && heap->apostadores[Direita].quantidade_acertos < heap->apostadores[Pai].quantidade_acertos) {
+        Pai = Direita;   
+    }
 
     if(Pai != i) {
     trocar_apostadores(&heap->apostadores[i], &heap->apostadores[Pai]);
@@ -62,35 +67,43 @@ Heap* criar_heap(uint32_t capacidade){
     return heap;
 }
 
-void inserir_heapmax(Heap* heap, apostadores apostador_inserido){
-    if (heap->tamanho == heap->capacidade) {
-        return;
+ Heap* construir_heap_max(apostadores* dados_originais, uint32_t quantidade){
+    // 1. Cria a estrutura do heap e copia todos os dados de uma vez
+    Heap* heap = criar_heap(quantidade);
+    heap->tamanho = quantidade;
+    for(uint32_t i = 0; i < quantidade; i++){
+        heap->apostadores[i] = dados_originais[i];
     }
 
-    heap->tamanho++;
-    int i = heap->tamanho - 1;
-    heap->apostadores[i] = apostador_inserido;
+    // 2. Encontra o índice do último nó que NÃO é uma folha
+    int ultimo_pai = (quantidade / 2) - 1;
 
-    while (i != 0 && heap->apostadores[(i - 1) / 2].quantidade_acertos < heap->apostadores[i].quantidade_acertos) {
-        trocar_apostadores(&heap->apostadores[i], &heap->apostadores[(i - 1) / 2]);
-        i = (i - 1) / 2;
+    // 3. Itera de baixo para cima, do último pai até a raiz, aplicando heapify
+    for(int i = ultimo_pai; i >= 0; i--){
+        heapify_max(heap, i);
     }
+
+    return heap;
 }
 
-void inserir_heapmin(Heap* heap, apostadores apostador_inserido){
-    if (heap->tamanho == heap->capacidade) {
-        return;
+Heap* construir_heap_min(apostadores* dados_originais, uint32_t quantidade){
+    // 1. Cria a estrutura do heap e copia todos os dados de uma vez
+    Heap* heap = criar_heap(quantidade);
+    heap->tamanho = quantidade;
+    for(uint32_t i = 0; i < quantidade; i++){
+        heap->apostadores[i] = dados_originais[i];
     }
 
-    heap->tamanho++;
-    int i = heap->tamanho - 1;
-    heap->apostadores[i] = apostador_inserido;
+    // 2. Encontra o índice do último nó que NÃO é uma folha
+    int ultimo_pai = (quantidade / 2) - 1;
 
-    while (i != 0 && heap->apostadores[(i - 1) / 2].quantidade_acertos > heap->apostadores[i].quantidade_acertos) {
-        trocar_apostadores(&heap->apostadores[i], &heap->apostadores[(i - 1) / 2]);
-        i = (i - 1) / 2;
+    // 3. Itera de baixo para cima, do último pai até a raiz, aplicando heapify
+    for(int i = ultimo_pai; i >= 0; i--){
+        heapify_min(heap, i);
     }
-}
+
+    return heap;
+} 
 
 apostadores extrair_Max(Heap* heap){
      if (heap->tamanho <= 0) {
@@ -134,22 +147,14 @@ apostadores extrair_Min(Heap* heap){
 
 int main(int argc, char* argv[]){
     FILE* input = fopen(argv[1], "r");
-    if(input == NULL){
-        perror("Nao foi possivel abrir o arquivo de input");
-        exit(1);
-    }
     FILE* output = fopen(argv[2], "w");
-    if(output == NULL){
-        perror("Nao foi possivel abrir o arquivo de output");
-        exit(1);
-    }
 
     uint32_t valor_premio = 0, quantidade_apostas = 0;
     fscanf(input, "%u", &valor_premio);
     fscanf(input, "%u", &quantidade_apostas);
 
     uint32_t metade_maior = valor_premio/2;
-    uint32_t metade_menor = valor_premio/2;
+    uint32_t metade_menor = valor_premio - metade_maior;
 
     uint32_t premio[10];
     fscanf(input, "%u %u %u %u %u %u %u %u %u %u", &premio[0], &premio[1], &premio[2], &premio[3], &premio[4], &premio[5], &premio[6], &premio[7], &premio[8], &premio[9]);
@@ -179,10 +184,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    Heap* heapmax = criar_heap(quantidade_apostas);
-    for(int i = 0; i < quantidade_apostas; i++){
-        inserir_heapmax(heapmax, apostador[i]);
-    }
+    Heap* heapmax = construir_heap_max(apostador, quantidade_apostas);
 
     apostadores* apostador_ganhador_max = (apostadores*) malloc(sizeof(apostadores) * quantidade_apostas);
     uint32_t quantidade_ganho_maximo = 0;
@@ -191,19 +193,15 @@ int main(int argc, char* argv[]){
     quantidade_ganho_maximo++;
 
     while(heapmax->tamanho > 0 && heapmax->apostadores[0].quantidade_acertos == referencia_maxima.quantidade_acertos) {
-            apostador_ganhador_max[quantidade_ganho_maximo++] = extrair_Max(heapmax);
-        }
+        apostador_ganhador_max[quantidade_ganho_maximo++] = extrair_Max(heapmax);
+    }
 
     fprintf(output, "[%u:%u:%u]\n", quantidade_ganho_maximo, referencia_maxima.quantidade_acertos, metade_maior/quantidade_ganho_maximo);
     for(int i = 0; i < quantidade_ganho_maximo; i++){
         fprintf(output, "%s\n", apostador_ganhador_max[i].chave);
     }
 
-    
-    Heap* heapmin = criar_heap(quantidade_apostas);
-    for(int i = 0; i < quantidade_apostas; i++){
-        inserir_heapmin(heapmin, apostador[i]);
-    }
+    Heap* heapmin = construir_heap_min(apostador, quantidade_apostas);
 
     apostadores* apostador_ganhador_min = (apostadores*) malloc(sizeof(apostadores) * quantidade_apostas);
     uint32_t quantidade_ganho_minimo = 0;
@@ -212,22 +210,13 @@ int main(int argc, char* argv[]){
     quantidade_ganho_minimo++;
 
     while(heapmin->tamanho > 0 && heapmin->apostadores[0].quantidade_acertos == referencia_minima.quantidade_acertos) {
-            apostador_ganhador_min[quantidade_ganho_minimo++] = extrair_Min(heapmin);
-        }
+        apostador_ganhador_min[quantidade_ganho_minimo++] = extrair_Min(heapmin);
+    }
 
     fprintf(output, "[%u:%u:%u]\n", quantidade_ganho_minimo, referencia_minima.quantidade_acertos, metade_menor/quantidade_ganho_minimo);
     for(int i = 0; i < quantidade_ganho_minimo; i++){
         fprintf(output, "%s\n", apostador_ganhador_min[i].chave);
     }
 
-   /*  free(apostador_ganhador_min);
-    free(apostador_ganhador_max);
-    free(apostador);
-    free(heapmax->apostadores);
-    free(heapmin->apostadores);
-    free(heapmax);
-    free(heapmin);
-    fclose(input);
-    fclose(output); */
     return 0;
 }
