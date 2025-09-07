@@ -5,8 +5,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-// gcc -Wall teste.c -o teste
-// ./teste input.txt output.txt
+// gcc -Wall teste2.c -o teste2
+// ./teste2 input.txt output.txt
 
 typedef struct no {
     uint32_t altura;
@@ -58,7 +58,7 @@ uint32_t myrand() {
     return next;
 }
 
-uint32_t geradora(uint32_t z){
+int32_t geradora(uint32_t z){
     return (z + (-1 + (myrand() % 3)));
 }
 
@@ -89,49 +89,15 @@ void propagar_cadeia(no*** matriz, no* paciente_zero, no* infectante_atual, uint
         if (encontrar_conjunto(proximo_alvo) != encontrar_conjunto(paciente_zero)) {
             break;
         }
+        else{
+            infectante_atual = proximo_alvo;
+        }
     }                               
     unir_conjuntos(paciente_zero, proximo_alvo);
     fprintf(output, ";(%d,%d)", novo_x, novo_y);
     printf("Infectando: (%d,%d)\n", novo_x, novo_y);
     
     propagar_cadeia(matriz, paciente_zero, proximo_alvo, altura, largura, output, infectados_count + 1, total_pessoas);
-}
-
-void propagar_cadeia2(no*** matriz, no* paciente_zero, no* infectante_atual, uint32_t altura, uint32_t largura, FILE* output, uint32_t infectados_count, uint32_t total_pessoas) {
-    if (infectados_count >= total_pessoas) {
-        return;
-    }
-
-    no* infectante_real = encontrar_conjunto(paciente_zero);
-    int32_t novo_x, novo_y;
-    no* proximo_alvo = NULL;
-    
-    while (true) {
-        while (true) {
-            novo_x = geradora(infectante_real->coordenada_x);
-            if (novo_x >= 0 && novo_x < (int32_t)largura) {
-                break;
-            }
-        }
-        
-        while (true) {
-            novo_y = geradora(infectante_real->coordenada_y);
-            if (novo_y >= 0 && novo_y < (int32_t)altura) {
-                break; 
-            }
-        }
-        
-        proximo_alvo = matriz[novo_x][novo_y];
-        
-        if (encontrar_conjunto(proximo_alvo) != infectante_real) {
-            break;
-        }
-    }                                                           
-    unir_conjuntos(infectante_real, proximo_alvo);
-    fprintf(output, ";(%d,%d)", novo_x, novo_y);
-    printf("Infectando: (%d,%d)\n", novo_x, novo_y);
-    
-    propagar_cadeia2(matriz, paciente_zero, proximo_alvo, altura, largura, output, infectados_count + 1, total_pessoas);
 }
 
 int main(int argc, char* argv[]) {
@@ -169,18 +135,60 @@ int main(int argc, char* argv[]) {
         fprintf(output, "%d:(%u,%u)", i + 1, epicentro_x, epicentro_y);
 
         uint32_t total_pessoas = altura * largura;
+        if (total_pessoas <= 1) {
+            fprintf(output, "\n");
+            for (int x = 0; x < largura; x++) {
+                for (int y = 0; y < altura; y++) {
+                    liberar_no(matriz[x][y]);
+                }
+                free(matriz[x]);
+            }
+            free(matriz);            
+            continue;
+        }
 
-        propagar_cadeia(matriz, matriz[epicentro_x][epicentro_y], matriz[epicentro_x][epicentro_y], altura, largura, output, 1, total_pessoas);
+        //propagar_cadeia(matriz, matriz[epicentro_x][epicentro_y], matriz[epicentro_x][epicentro_y], altura, largura, output, 1, total_pessoas);
+        no* paciente_zero = matriz[epicentro_x][epicentro_y];
+        no* infectante_atual = paciente_zero;
+
+        uint32_t infectados_count = 1;
+
+        while (infectados_count < total_pessoas) {
+            int32_t novo_x, novo_y;
+            no* proximo_alvo = NULL;
+
+            while(true) {
+                while (true) {
+                    novo_x = geradora(infectante_atual->coordenada_x);
+                    if (novo_x >= 0 && novo_x < (int32_t)largura) {
+                        break;
+                    }
+                }
+                
+                while (true) {
+                    novo_y = geradora(infectante_atual->coordenada_y);
+                    if (novo_y >= 0 && novo_y < (int32_t)altura) {
+                        break; 
+                    }
+                }
+                
+                proximo_alvo = matriz[novo_x][novo_y];
+                
+                if (encontrar_conjunto(proximo_alvo) != encontrar_conjunto(paciente_zero)) {
+                    break;
+                } else {
+                    infectante_atual = proximo_alvo;
+                }
+            }
+            
+            unir_conjuntos(paciente_zero, proximo_alvo);
+            fprintf(output, ";(%d,%d)", novo_x, novo_y);
+            
+            infectados_count++;
+            infectante_atual = proximo_alvo;
+        }
 
         fprintf(output, "\n");
-
-        for (int x = 0; x < largura; x++) {
-            for (int y = 0; y < altura; y++) {
-                liberar_no(matriz[x][y]);
-            }
-            free(matriz[x]);
-        }
-        free(matriz);
     }
 
     fclose(input);
